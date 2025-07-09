@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+
+database:
+  engine: MYSQL
+  url: jdbc:mysql://localhost:3306/landlords?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8&useUnicode=true
+  username: root
+  password: root
+
+
+#database:
+#  engine: SQLite
+#  url: jdbc:sqlite:db/landlords.sqlite3
+#  username:
+#  password:
+
+landlords:
+  frontend-host: localhost:9000
+  jwt-secret: 298b8610-6835-4d12-b8ae-efba3dbcccad
+
+logging:
+  level:
+    site.pushy.landlords.dao: debug

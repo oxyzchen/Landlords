@@ -1,0 +1,13 @@
+server:
+  port: 8085
+
+database:
+  engine: SQLite
+  url: jdbc:sqlite:db/landlords.sqlite3
+  username:
+  password:
+
+landlords:
+  frontend-host: landlords.pushyzheng.com
+  jwt-secret: 298b8610-6835-4d12-b8ae-efba3dbcccad
+  max-seconds-for-every-round: 30
