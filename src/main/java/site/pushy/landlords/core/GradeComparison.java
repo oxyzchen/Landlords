@@ -110,6 +110,8 @@ public class GradeComparison {
     /**
      * 判断当前玩家手中是否有牌可以管住上家出的牌
      *
+     * 其实应该写在前端的，没必要后端生成，后端只要负责判断牌的合法性
+     *
      * @param myCards   当前玩家手中所有的牌
      * @param prevCards 上家出的牌
      * @param prevType  上家出的牌的类型

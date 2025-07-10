@@ -2,8 +2,6 @@ package site.pushy.landlords.service;
 
 import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
-import site.pushy.landlords.pojo.Player;
-import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.pojo.RoundResult;
 
 import java.util.List;
@@ -23,8 +21,10 @@ public interface GameService {
 
     /**
      * 取消准备
+     *
+     * @return
      */
-    void unReadyGame(User curUser);
+    boolean unReadyGame(User curUser);
 
     /**
      * 叫牌，并分配该玩家该地主身份，并将三张地主加入到该玩家的牌中

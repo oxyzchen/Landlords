@@ -76,6 +76,10 @@ public class Room {
     private int biddingPlayer;
 
     /**
+     * 第一个叫牌的玩家
+     */
+    private int firstBiddingPlayerId;
+    /**
      * 上一回合玩家打出的牌
      */
     private List<Card> preCards;
@@ -89,6 +93,10 @@ public class Room {
      * 上一回合玩家出牌的时间戳
      */
     private long prePlayTime;
+    /*
+    叫上了地主, 初始值为4，叫上了设置为0，都不叫则回到第一个玩家
+     */
+    private int wanted;
 
     @JsonIgnore
     private CardDistribution distribution;
@@ -112,6 +120,8 @@ public class Room {
         this.prePlayerId = 0;
         this.stepNum = -1;   // 当step = -1时代表叫牌还未结束
         this.biddingPlayer = -1;
+        this.firstBiddingPlayerId = -1;
+        this.wanted = 4;
         this.sync = new ReentrantLock();
     }
 
@@ -130,7 +140,9 @@ public class Room {
         this.prePlayerId = 0;
         this.stepNum = -1;
         this.biddingPlayer = -1;
+        this.firstBiddingPlayerId = -1;
         this.prePlayTime = 0;
+        this.wanted = 4;
         // 初始化Player对象的值
         for (Player player : playerList) {
             player.reset();

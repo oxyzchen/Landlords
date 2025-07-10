@@ -3,6 +3,7 @@ package site.pushy.landlords.service.impl;
 import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.pushy.landlords.common.exception.ForbiddenException;
 import site.pushy.landlords.core.CardDistribution;
@@ -21,6 +22,7 @@ import site.pushy.landlords.pojo.Room;
 import site.pushy.landlords.pojo.RoundResult;
 import site.pushy.landlords.pojo.ws.*;
 import site.pushy.landlords.service.GameService;
+import site.pushy.landlords.service.PlayerService;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -42,6 +44,8 @@ public class GameServiceImpl implements GameService {
 
     @Resource
     private NotifyComponent notifyComponent;
+    @Autowired
+    private PlayerService playerService;
 
     @Override
     public boolean readyGame(User user) {
@@ -66,7 +70,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void unReadyGame(User curUser) {
+    public boolean unReadyGame(User curUser) {
         Room room = roomComponent.getUserRoom(curUser.getId());
         Player player = room.getPlayerByUserId(curUser.getId());
         player.setReady(false);
@@ -74,26 +78,31 @@ public class GameServiceImpl implements GameService {
         roomComponent.updateRoom(room);
         // 取消准备通知
         notifyComponent.sendToAllUserOfRoom(room.getId(), new UnReadyGameMessage(curUser.getId()));
+        return false;
     }
 
     @Override
     public void want(User user, int score) {
         Room room = roomComponent.getUserRoom(user.getId());
-        logger.info("[{}] 玩家 {} 叫牌，分数为 {} 分", room.getId(), user.getUsername(), score);
-
-        room.setMultiple(score);
         User landlordUser = null;
+        if(room.getWanted() == 0){
+            throw new ForbiddenException("不能叫地主了");
+        }
         for (Player player : room.getPlayerList()) {
             if (player.getUser().getId().equals(user.getId())) {
-                if (player.getId() != room.getBiddingPlayer()) {
+                if (player.getId() != room.getBiddingPlayer() && room.getWanted()!=1 ) {
                     throw new ForbiddenException("不是当前用户的叫牌回合");
                 }
                 landlordUser = player.getUser();
                 room.setStepNum(player.getId());
+                room.setWanted(0);//叫上了地主
+                room.setMultiple(score);
+                logger.info("[{}] 玩家 {} 叫牌，分数为 {} 分", room.getId(), user.getUsername(), score);
                 player.setIdentity(IdentityEnum.LANDLORD);
                 // 将三张地主牌分配给地主
                 CardDistribution distribution = room.getDistribution();
                 player.addCards(distribution.getTopCards());
+
             } else {
                 player.setIdentity(IdentityEnum.FARMER);
             }
@@ -111,6 +120,23 @@ public class GameServiceImpl implements GameService {
     @Override
     public void noWant(User user) {
         Room room = roomComponent.getUserRoom(user.getId());
+        if(room.getWanted() == 0){
+            throw new ForbiddenException("不能叫地主了");
+        }
+        // 不叫一次，wanted 减一
+        room.setWanted(room.getWanted() - 1);
+        logger.info("[{}] 玩家 {} 不叫地主，剩余机会 {}", room.getId(), user.getUsername(), room.getWanted());
+        // 叫地主机会用完了，强制第一位玩家叫地主
+        if (room.getWanted() == 1) {
+            logger.info("[{}] 所有玩家不叫，强制第一位玩家叫 1 分", room.getId());
+
+            Player firstPlayer = room.getPlayerList().stream()
+                    .filter(p -> p.getId() == room.getFirstBiddingPlayerId())
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("未找到首个叫牌玩家"));
+            want(firstPlayer.getUser(), 1); // 强制第一人叫1分
+            return; // 注意：不要继续广播下家叫牌消息
+        }
         room.incrBiddingPlayer();
         for (Player player : room.getPlayerList()) {
             if (player.getUser().getId().equals(user.getId())) {
@@ -239,6 +265,7 @@ public class GameServiceImpl implements GameService {
         // 在分牌之后随机分牌一个玩家进行叫地主
         int order = random.nextInt(3) + 1;  //从1到3的int型随机数
         room.setBiddingPlayer(order);
+        room.setFirstBiddingPlayerId(order);
         Player player = room.getPlayerById(order);
         // 通知被选择叫牌的玩家客户端开始叫牌
         logger.info("[{}] 通知玩家 {} 叫牌", room.getId(), player.getUser().getUsername());

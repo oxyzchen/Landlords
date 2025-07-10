@@ -72,7 +72,7 @@ public class RoomOutDTO {
                 .collect(Collectors.toList());
         roomOutDTO.status = room.getStatus();
         roomOutDTO.multiple = room.getMultiple();
-        if (room.getDistribution() != null) {
+        if (room.getDistribution() != null && room.getWanted()==0) {
             roomOutDTO.topCards = room.getDistribution().getTopCards();
         }
         roomOutDTO.stepNum = room.getStepNum();
