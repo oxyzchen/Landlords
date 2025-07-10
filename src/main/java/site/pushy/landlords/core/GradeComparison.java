@@ -6,7 +6,10 @@ import site.pushy.landlords.core.enums.TypeEnum;
 import site.pushy.landlords.pojo.Card;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Pushy
@@ -53,45 +56,52 @@ public class GradeComparison {
         if (prevType != myType) {
             return false;
         }
-        /* 3带1，只需要比较第二张牌的等级即可 */
-        if (prevType == TypeEnum.THREE_WITH_ONE) {
-            myCard = myCards.get(1);
-            prevCard = prevCards.get(1);
-            return CardUtils.compareGradeTo(myCard, prevCard);
+        //除了炸弹和王炸 可以压不同张数的牌，其他情况都要牌的数量和上次出牌数量一致
+        if (mySize != prevSize) {  // 出的顺子牌数不同，无法出牌
+            return false;
         }
-        /* 3带一对，只需要比较第三张牌即可 */
-        else if (prevType == TypeEnum.THREE_WITH_PAIR) {
+        /* 3带1、4带2、3带一对，只需要比较第三张牌的等级即可 */
+        if (prevType == TypeEnum.THREE_WITH_ONE||prevType == TypeEnum.THREE_WITH_PAIR||prevType == TypeEnum.FOUR_WITH_TWO) {
             myCard = myCards.get(2);
             prevCard = prevCards.get(2);
             return CardUtils.compareGradeTo(myCard, prevCard);
         }
-        /* 4带2，只需要比较第三张牌大小的等级 */
-        else if (prevType == TypeEnum.FOUR_WITH_TWO) {
-            myCard = myCards.get(2);
-            prevCard = prevCards.get(2);
-            return CardUtils.compareGradeTo(myCard, prevCard);
-        }
+
         /* 顺子、连对一样，只需要比较最大的一张牌的大小 */
         else if (prevType == TypeEnum.STRAIGHT || prevType == TypeEnum.STRAIGHT_PAIR) {
-            if (mySize != prevSize) {  // 出的顺子牌数不同，无法出牌
-                return false;
-            }
             myCard = myCards.get(mySize - 1);
             prevCard = prevCards.get(prevSize - 1);
             return CardUtils.compareGradeTo(myCard, prevCard);
         }
-        /* 飞机 */
-        else if (prevType == TypeEnum.AIRCRAFT) {
-            if (mySize == prevSize) {
-                return false;
-            } else {
-                // Todo 飞机判断存在问题
-                myCard = myCards.get(5);
-                prevCard = prevCards.get(5);
-                return CardUtils.compareGradeTo(myCard, prevCard);
+        /* 飞机带翅膀 */
+        else if (prevType == TypeEnum.AIRCRAFT_WITH_WINGS) {
+            //记录各个牌型的数量 如 3张3 三张4 两张2
+            Map<Integer, Integer> myCardcnt = new HashMap<>();
+            Map<Integer, Integer> preCardcnt = new HashMap<>();
+
+            for (Card card : myCards) {
+                myCardcnt.put(card.getGradeValue(), myCardcnt.getOrDefault(card.getGradeValue(), 0) + 1);
             }
+            for (Card card : prevCards) {
+                preCardcnt.put(card.getGradeValue(), preCardcnt.getOrDefault(card.getGradeValue(), 0) + 1);
+            }
+            //把有三个的提出来，组成一个新的list
+            List<Integer> myCardaircraft = myCardcnt.entrySet().stream()
+                    .filter(entry -> entry.getValue() >= 3)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+
+            List<Integer> preCardaircraft = preCardcnt.entrySet().stream()
+                    .filter(entry -> entry.getValue() >= 3)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+
+            if(myCardaircraft.get(0)>preCardaircraft.get(0)){
+                return true;
+            }
+            return false;
         }
-        /* 单张、对子、三张、炸弹等情况，都是只需要判断第一张牌大小即可 */
+        /* 单张、对子、三张、炸弹、飞机，都是只需要判断第一张牌大小即可 */
         else {
             return CardUtils.compareGradeTo(myCard, prevCard);
         }

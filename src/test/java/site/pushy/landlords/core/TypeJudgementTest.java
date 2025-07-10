@@ -51,6 +51,7 @@ public class TypeJudgementTest {
     @Test
     public void isJokerBomb() {
         Assert.assertTrue(TypeJudgement.isJokerBomb(buildCards(FOURTEENTH, FIFTEENTH)));
+        Assert.assertTrue(TypeJudgement.isJokerBomb(buildCards(FIFTEENTH, FOURTEENTH)));
 
         Assert.assertFalse(TypeJudgement.isJokerBomb(buildCards(FOURTEENTH, FOURTEENTH)));
         Assert.assertFalse(TypeJudgement.isJokerBomb(buildCards(FIFTEENTH, FIFTEENTH)));
@@ -73,6 +74,7 @@ public class TypeJudgementTest {
     public void isThreeWithPair() {
         // 3带1对
         Assert.assertTrue(TypeJudgement.isThreeWithPair(buildCards(SECOND, SECOND, SECOND, FIRST, FIRST)));
+        Assert.assertTrue(TypeJudgement.isThreeWithPair(buildCards(THIRD, THIRD, THIRD, TENTH, TENTH)));
 
         Assert.assertFalse(TypeJudgement.isThreeWithPair(buildCards(SECOND, SECOND, SECOND, FIRST, SECOND)));
     }
@@ -141,6 +143,8 @@ public class TypeJudgementTest {
         Assert.assertTrue(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, SECOND, SIXTH, EIGHTH)));
         // 3 3 3 4 4 4 8 8 10 10
         Assert.assertTrue(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, SECOND, SIXTH, SIXTH, EIGHTH, EIGHTH)));
+        // 999 101010 3 4
+        Assert.assertTrue(TypeJudgement.isAircraftWithWing(buildCards(SEVENTH, SEVENTH, SEVENTH, EIGHTH, EIGHTH, EIGHTH, FIRST, EIGHTH)));
         // 3 3 3 4 4 4 8 8
         Assert.assertTrue(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, SECOND, SIXTH, SIXTH)));
         // 777 888 999 5QQ

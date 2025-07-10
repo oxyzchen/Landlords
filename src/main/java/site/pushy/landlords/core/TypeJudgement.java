@@ -80,14 +80,11 @@ public class TypeJudgement {
 
         CardUtils.sortCards(cards);
         // 是 3 带 1，并且被带的牌在牌头
-        if (cards.get(0).equalsByGrade(cards.get(1)) && cards.get(0).equalsByGrade(cards.get(2))) {
-            return true;
-        }
         // 是 3 带 1，并且被带的牌在牌尾
-        // noinspection RedundantIfStatement
-        if (cards.get(3).equalsByGrade(cards.get(1)) && cards.get(3).equalsByGrade(cards.get(2))) {
+        if(isAllGradeEqual(cards,0,2)||isAllGradeEqual(cards,1,3)) {
             return true;
         }
+
         return false;
     }
 
@@ -99,13 +96,8 @@ public class TypeJudgement {
             return false;
         }
         CardUtils.sortCards(cards);
-        if (cards.get(0).equalsByGrade(cards.get(1)) && cards.get(0).equalsByGrade(cards.get(2))) {
-            return cards.get(3).equalsByGrade(cards.get(4));
-        }
-        if (cards.get(2).equalsByGrade(cards.get(3))
-                && cards.get(2).equalsByGrade(cards.get(4))
-                && cards.get(3).equalsByGrade(cards.get(4))) {
-            return cards.get(0).equalsByGrade(cards.get(1));
+        if(isAllGradeEqual(cards,0,2)&&isAllGradeEqual(cards,3,4) ||isAllGradeEqual(cards,0,1)&&isAllGradeEqual(cards,2,4)) {
+            return true;
         }
         return false;
     }
@@ -119,12 +111,9 @@ public class TypeJudgement {
         }
         CardUtils.sortCards(cards);
 
+
         for (int i = 0; i < 3; i++) {
-            int grade1 = cards.get(i).getGradeValue();
-            int grade2 = cards.get(i + 1).getGradeValue();
-            int grade3 = cards.get(i + 2).getGradeValue();
-            int grade4 = cards.get(i + 3).getGradeValue();
-            if (grade2 == grade1 && grade3 == grade1 && grade4 == grade1) {
+            if(isAllGradeEqual(cards,i,i+3)) {
                 return true;
             }
         }
@@ -240,7 +229,7 @@ public class TypeJudgement {
         }
         //把有三个的提出来，组成一个新的list
         List<Integer> aircraftList = counter.entrySet().stream()
-                .filter(entry -> entry.getValue() == 3)
+                .filter(entry -> entry.getValue() >= 3)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
         // 飞机要保证递增, 且不包含2
