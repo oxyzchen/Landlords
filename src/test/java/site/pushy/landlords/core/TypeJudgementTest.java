@@ -84,6 +84,9 @@ public class TypeJudgementTest {
         Assert.assertTrue(TypeJudgement.isFourWithTwo(buildCards(SECOND, SECOND, SECOND, SECOND, FIRST, THIRD)));
         Assert.assertTrue(TypeJudgement.isFourWithTwo(buildCards(SECOND, SECOND, SECOND, SECOND, FIRST, FIRST)));
         Assert.assertTrue(TypeJudgement.isFourWithTwo(buildCards(SECOND, SECOND, SECOND, SECOND, THIRD, THIRD)));
+        Assert.assertTrue(TypeJudgement.isFourWithTwo(buildCards(SECOND, SECOND, SECOND, SECOND, FIRST,FIRST,THIRD,THIRD)));
+        Assert.assertFalse(TypeJudgement.isFourWithTwo(buildCards(SECOND, SECOND, SECOND, SECOND, THIRD,FIRST,THIRD,THIRD)));
+        Assert.assertFalse(TypeJudgement.isFourWithTwo(buildCards(SECOND, SECOND, SECOND, SECOND, THIRD,THIRD,THIRD,THIRD)));
     }
 
     @Test

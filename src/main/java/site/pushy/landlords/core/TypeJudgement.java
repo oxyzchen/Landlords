@@ -106,17 +106,28 @@ public class TypeJudgement {
      * 判断是否出的牌是四带二
      */
     public static boolean isFourWithTwo(List<Card> cards) {
-        if (isEmpty(cards) || cards.size() != 6) {
+        if (isEmpty(cards) || cards.size() != 6&&cards.size() != 8) {
             return false;
         }
         CardUtils.sortCards(cards);
 
-
-        for (int i = 0; i < 3; i++) {
-            if(isAllGradeEqual(cards,i,i+3)) {
+        //如果四带两张牌
+        if(cards.size()==6){
+            for (int i = 0; i < 3; i++) {
+                if(isAllGradeEqual(cards,i,i+3)) {
+                    return true;
+                }
+            }
+        }
+        //禁止四带四
+        else{
+            if(cards.get(0).getGradeValue()==cards.get(1).getGradeValue()&&cards.get(2).getGradeValue()==cards.get(3).getGradeValue()&&isAllGradeEqual(cards,4,7)&&cards.get(0).getGradeValue()!=cards.get(2).getGradeValue()|| //224
+                    cards.get(0).getGradeValue()==cards.get(1).getGradeValue()&&cards.get(6).getGradeValue()==cards.get(7).getGradeValue()&&isAllGradeEqual(cards,2,5)&&cards.get(0).getGradeValue()!=cards.get(7).getGradeValue()|| //242
+                    cards.get(4).getGradeValue()==cards.get(5).getGradeValue()&&cards.get(6).getGradeValue()==cards.get(7).getGradeValue()&&isAllGradeEqual(cards,0,3)&&cards.get(4).getGradeValue()!=cards.get(7).getGradeValue()) {//422
                 return true;
             }
         }
+
         return false;
     }
 

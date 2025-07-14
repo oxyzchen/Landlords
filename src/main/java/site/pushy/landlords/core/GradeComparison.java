@@ -60,8 +60,8 @@ public class GradeComparison {
         if (mySize != prevSize) {  // 出的顺子牌数不同，无法出牌
             return false;
         }
-        /* 3带1、4带2、3带一对，只需要比较第三张牌的等级即可 */
-        if (prevType == TypeEnum.THREE_WITH_ONE||prevType == TypeEnum.THREE_WITH_PAIR||prevType == TypeEnum.FOUR_WITH_TWO) {
+        /* 3带1、3带一对，只需要比较第三张牌的等级即可 */
+        else if (prevType == TypeEnum.THREE_WITH_ONE||prevType == TypeEnum.THREE_WITH_PAIR||prevType == TypeEnum.FOUR_WITH_TWO) {
             myCard = myCards.get(2);
             prevCard = prevCards.get(2);
             return CardUtils.compareGradeTo(myCard, prevCard);
@@ -73,8 +73,8 @@ public class GradeComparison {
             prevCard = prevCards.get(prevSize - 1);
             return CardUtils.compareGradeTo(myCard, prevCard);
         }
-        /* 飞机带翅膀 */
-        else if (prevType == TypeEnum.AIRCRAFT_WITH_WINGS) {
+        /* 飞机带翅膀、 4带2 */
+        else if (prevType == TypeEnum.AIRCRAFT_WITH_WINGS||prevType == TypeEnum.FOUR_WITH_TWO) {
             //记录各个牌型的数量 如 3张3 三张4 两张2
             Map<Integer, Integer> myCardcnt = new HashMap<>();
             Map<Integer, Integer> preCardcnt = new HashMap<>();
@@ -107,29 +107,5 @@ public class GradeComparison {
         }
     }
 
-    /**
-     * 判断当前玩家手中是否有牌可以管住上家出的牌
-     *
-     * 其实应该写在前端的，没必要后端生成，后端只要负责判断牌的合法性
-     *
-     * @param myCards   当前玩家手中所有的牌
-     * @param prevCards 上家出的牌
-     * @param prevType  上家出的牌的类型
-     */
-    public static boolean hasHighGradeCards(List<Card> myCards,
-                                            List<Card> prevCards, TypeEnum prevType) {
-        if (myCards == null || prevCards == null) {
-            return false;
-        }
-        if (prevType == null) {
-            logger.error("上家出的牌不合法，无法出牌");
-            return false;
-        }
 
-        // Todo 实现 => 判断当前玩家手中是否有牌可以管住上家出的牌
-
-        Collections.sort(myCards);
-        Collections.sort(prevCards);
-        return false;
-    }
 }
