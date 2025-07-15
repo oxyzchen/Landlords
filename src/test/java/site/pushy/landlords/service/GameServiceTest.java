@@ -223,7 +223,7 @@ public class GameServiceTest {
         res = hasHighGradeCards(cardsA1,buildCards(FIRST,SECOND,FIRST,SECOND,FIRST,SECOND,TENTH,THIRD), TypeEnum.AIRCRAFT_WITH_WINGS);
         System.out.println("可出的牌："+res);
         System.out.println("====飞机带两对子====");
-        List<Card> cardsA2 = buildCards(FIFTH,FIFTH,FIFTH,SIXTH,SIXTH,SIXTH,SEVENTH,SEVENTH,TENTH,TENTH,NINTH);
+        List<Card> cardsA2 = buildCards(FIFTH,FIFTH,FIFTH,SIXTH,SIXTH,SIXTH,SEVENTH,SEVENTH,TENTH,TENTH,NINTH,SIXTH);
         System.out.println("手牌："+cardsA2);
         res = hasHighGradeCards(cardsA2,buildCards(FIRST,SECOND,FIRST,SECOND,FIRST,SECOND,TENTH,THIRD,TENTH,THIRD), TypeEnum.AIRCRAFT_WITH_WINGS);
         System.out.println("可出的牌："+res);

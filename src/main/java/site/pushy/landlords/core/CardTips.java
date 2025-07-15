@@ -33,46 +33,74 @@ public class CardTips {
         Collections.sort(prevCards);
         List<List<Card>> result = null;
 
-
-        if(prevType == TypeEnum.SINGLE){//上家的牌，大于自己最大的手牌
-            if(prevCards.get(0).getGradeValue()>myCards.get(0).getGradeValue()){
+        switch (prevType) {
+            case SINGLE:
+                if(prevCards.get(0).getGradeValue()>myCards.get(0).getGradeValue()){
+                    break;
+                }
+                result = findHigherSingleCards(myCards, prevCards.get(0));
+                break;
+            case PAIR:
+                if(prevCards.get(0).getGradeValue()>myCards.get(0).getGradeValue()){
+                    break;
+                }
+                result = findHigherPairOrThreeCards(myCards, prevCards, 2);
+                break;
+            case THREE:
+                if(prevCards.get(0).getGradeValue()>myCards.get(0).getGradeValue()){
+                    break;
+                }
+                result = findHigherPairOrThreeCards(myCards, prevCards, 3);
+                break;
+            case THREE_WITH_ONE:
+            case THREE_WITH_PAIR:
+            case FOUR_WITH_TWO:
+                result = findThreeOrFourWithAttach(myCards, prevCards, prevType);
+                break;
+            case STRAIGHT:
+                result = findStraight(myCards, prevCards);
+                break;
+            case STRAIGHT_PAIR:
+            case AIRCRAFT:
+                result = findStraightPairOrAircraft(myCards, prevCards, prevType);
+                break;
+            case AIRCRAFT_WITH_WINGS:
+                result = findAircraftWithWings(myCards, prevCards);
+                break;
+            // ✅ 如果上家是炸弹，你只能出更大的炸弹或王炸
+            case BOMB:
+                result = findBombs(myCards).stream()
+                        .filter(bomb -> bomb.get(0).getGradeValue() > prevCards.get(0).getGradeValue())
+                        .collect(Collectors.toList());
+                if (result.isEmpty()) {
+                    List<Card> jokerBomb = findJokerBomb(myCards);
+                    if (jokerBomb != null) {
+                        result = Collections.singletonList(jokerBomb);
+                    }
+                }
+                break;
+            // ✅ 如果上家是王炸，直接返回 null
+            case JOKER_BOMB:
                 return null;
-            }
-            else{
-                return findHigherSingleCards(myCards,prevCards.get(0));
-            }
         }
-        else if(prevType == TypeEnum.PAIR){
-            if(prevCards.get(0).getGradeValue()>myCards.get(0).getGradeValue()){
-                return null;
+        // 如果不是炸弹类，尝试炸弹或王炸压制
+        if (prevType != TypeEnum.BOMB &&
+                prevType != TypeEnum.JOKER_BOMB) {
+            List<List<Card>> bombs = findBombs(myCards);
+            if (!bombs.isEmpty()){
+                if (result == null) result = new ArrayList<>();
+                result.addAll(bombs);
             }
-            else{
-                return findHigherPairOrThreeCards(myCards,prevCards,2);
+
+            List<Card> jokerBomb = findJokerBomb(myCards);
+            if (jokerBomb != null){
+                if (result == null) result = new ArrayList<>();
+                result.add(jokerBomb);
             }
-        }
-        else if(prevType == TypeEnum.THREE){
-            if(prevCards.get(0).getGradeValue()>myCards.get(0).getGradeValue()){
-                return null;
-            }
-            else{
-                return findHigherPairOrThreeCards(myCards,prevCards,3);
-            }
-        }
-        else if(prevType == TypeEnum.THREE_WITH_ONE||prevType == TypeEnum.THREE_WITH_PAIR||prevType == TypeEnum.FOUR_WITH_TWO){
-            return findThreeOrFourWithAttach(myCards, prevCards, prevType);
-        }
-        else if(prevType == TypeEnum.STRAIGHT){
-            return findStraight(myCards, prevCards);
-        }
-        else if(prevType == TypeEnum.STRAIGHT_PAIR||prevType == TypeEnum.AIRCRAFT){
-            return findStraightPairOrAircraft(myCards, prevCards, prevType);
-        }
-        else if(prevType == TypeEnum.AIRCRAFT_WITH_WINGS){
-            return findAircraftWithWings(myCards, prevCards);
         }
 
 
-        return null;
+        return result;
     }
 
     public static List<List<Card>> findHigherSingleCards(List<Card> myCards, Card prevCard) {
@@ -478,6 +506,40 @@ public class CardTips {
     }
 
 
+    // 查找普通炸弹（4张相同）
+    public static List<List<Card>> findBombs(List<Card> cards) {
+        Map<Integer, List<Card>> map = new HashMap<>();
+        for (Card card : cards) {
+            map.computeIfAbsent(card.getGradeValue(), k -> new ArrayList<>()).add(card);
+        }
+
+        List<List<Card>> result = new ArrayList<>();
+        for (List<Card> group : map.values()) {
+            if (group.size() == 4) {
+                result.add(new ArrayList<>(group));
+            }
+        }
+        return result;
+    }
+
+    // 查找王炸（大王+小王）
+    public static List<Card> findJokerBomb(List<Card> cards) {
+        boolean hasSmall = false, hasBig = false;
+        Card smallJoker = null, bigJoker = null;
+        for (Card c : cards) {
+            if (c.getGradeValue() == 14) { // 小王
+                hasSmall = true;
+                smallJoker = c;
+            } else if (c.getGradeValue() == 15) { // 大王
+                hasBig = true;
+                bigJoker = c;
+            }
+        }
+        if (hasSmall && hasBig) {
+            return Arrays.asList(smallJoker, bigJoker);
+        }
+        return null;
+    }
 
 
 
