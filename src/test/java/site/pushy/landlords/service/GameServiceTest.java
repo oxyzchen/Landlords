@@ -3,8 +3,12 @@ package site.pushy.landlords.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import site.pushy.landlords.core.CardTips;
 import site.pushy.landlords.core.component.RoomComponent;
+import site.pushy.landlords.core.enums.CardGradeEnum;
 import site.pushy.landlords.core.enums.IdentityEnum;
+import site.pushy.landlords.core.enums.TypeEnum;
+import site.pushy.landlords.pojo.Card;
 import site.pushy.landlords.pojo.DO.User;
 import site.pushy.landlords.pojo.Player;
 import site.pushy.landlords.pojo.Room;
@@ -12,6 +16,13 @@ import site.pushy.landlords.core.enums.RoomStatusEnum;
 import site.pushy.landlords.service.impl.GameServiceImpl;
 
 import javax.annotation.Resource;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static site.pushy.landlords.core.CardTips.hasHighGradeCards;
+import static site.pushy.landlords.core.enums.CardGradeEnum.*;
 
 @SpringBootTest
 public class GameServiceTest {
@@ -150,9 +161,79 @@ public class GameServiceTest {
         Assertions.assertEquals(20,room.getPlayerById(2).getCards().size());
         Assertions.assertEquals(17,room.getPlayerById(1).getCards().size());
         Assertions.assertEquals(17,room.getPlayerById(3).getCards().size());
+
+        //假设上家出了单牌
+        System.out.println("====单张====");
+        System.out.println("手牌："+player2.getCards());
+        List<List<Card>> res = hasHighGradeCards(player2.getCards(),buildCards(THIRD), TypeEnum.SINGLE);
+        System.out.println("可出的牌："+res);
+        System.out.println("====对子====");
+        System.out.println("手牌："+player2.getCards());
+        res = hasHighGradeCards(player2.getCards(),buildCards(THIRD,THIRD), TypeEnum.PAIR);
+        System.out.println("可出的牌："+res);
+        System.out.println("====三张====");
+        System.out.println("手牌："+player2.getCards());
+        res = hasHighGradeCards(player2.getCards(),buildCards(THIRD,THIRD,THIRD), TypeEnum.THREE);
+        System.out.println("可出的牌："+res);
+        System.out.println("====三带一====");
+        System.out.println("手牌："+player2.getCards());
+        res = hasHighGradeCards(player2.getCards(),buildCards(THIRD,THIRD,THIRD,FIRST), TypeEnum.THREE_WITH_ONE);
+        System.out.println("可出的牌："+res);
+        System.out.println("====三带二====");
+        System.out.println("手牌："+player2.getCards());
+        res = hasHighGradeCards(player2.getCards(),buildCards(THIRD,THIRD,THIRD,FIRST,FIRST), TypeEnum.THREE_WITH_PAIR);
+        System.out.println("可出的牌："+res);
+        System.out.println("====四带二====");
+        List<Card> cards4 = buildCards(FOURTH,FOURTH,FOURTH,FOURTH,FIRST,FIRST,THIRD,NINTH,NINTH,TENTH);
+        System.out.println("手牌："+cards4);
+        res = hasHighGradeCards(cards4,buildCards(THIRD,THIRD,THIRD,THIRD,FIRST,FIRST), TypeEnum.FOUR_WITH_TWO);
+        System.out.println("可出的牌："+res);
+        System.out.println("====四带二,对子====");
+        System.out.println("手牌："+cards4);
+        res = hasHighGradeCards(cards4,buildCards(THIRD,THIRD,THIRD,THIRD,FIRST,FIRST,SECOND,SECOND), TypeEnum.FOUR_WITH_TWO);
+        System.out.println("可出的牌："+res);
+        System.out.println("====四带二,对子====");
+        List<Card> cards42 = buildCards(FOURTH,FOURTH,FOURTH,FOURTH,FIRST,FIRST,THIRD,NINTH,TENTH);
+        System.out.println("手牌："+cards4);
+        res = hasHighGradeCards(cards42,buildCards(THIRD,THIRD,THIRD,THIRD,FIRST,FIRST,SECOND,SECOND), TypeEnum.FOUR_WITH_TWO);
+        System.out.println("可出的牌："+res);
+        System.out.println("====顺子====");
+        List<Card> cardsS = buildCards(SECOND,THIRD,FOURTH,FIFTH,SIXTH,SEVENTH,EIGHTH,NINTH,FIFTH);
+        System.out.println("手牌："+cardsS);
+        res = hasHighGradeCards(cardsS,buildCards(FIRST,SECOND,THIRD,FOURTH,FIFTH,SIXTH,SEVENTH), TypeEnum.STRAIGHT);
+        System.out.println("可出的牌："+res);
+        System.out.println("====顺子====");
+        List<Card> cardsS2 = buildCards(THIRD,FOURTH,FIFTH,SIXTH,SEVENTH,EIGHTH,NINTH,TENTH);
+        System.out.println("手牌："+cardsS2);
+        res = hasHighGradeCards(cardsS2,buildCards(FIRST,SECOND,THIRD,FOURTH,FIFTH,SIXTH,SEVENTH), TypeEnum.STRAIGHT);
+        System.out.println("可出的牌："+res);
+        System.out.println("====连对====");
+        List<Card> cardsP2 = buildCards(FIFTH,SIXTH,SEVENTH,FIFTH,SIXTH,SEVENTH,EIGHTH,EIGHTH);
+        System.out.println("手牌："+cardsP2);
+        res = hasHighGradeCards(cardsP2,buildCards(FIRST,SECOND,THIRD,FIRST,SECOND,THIRD), TypeEnum.STRAIGHT_PAIR);
+        System.out.println("可出的牌："+res);
+        System.out.println("====飞机====");
+        List<Card> cardsA = buildCards(FIFTH,SIXTH,SEVENTH,FIFTH,SIXTH,SEVENTH,EIGHTH,EIGHTH,SIXTH,SEVENTH,EIGHTH,EIGHTH);
+        System.out.println("手牌："+cardsA);
+        res = hasHighGradeCards(cardsA,buildCards(FIRST,SECOND,FIRST,SECOND,FIRST,SECOND), TypeEnum.AIRCRAFT);
+        System.out.println("可出的牌："+res);
+        System.out.println("====飞机带两单张====");
+        List<Card> cardsA1 = buildCards(FIFTH,FIFTH,FIFTH,SIXTH,SIXTH,SIXTH,SEVENTH,TENTH,TWELFTH);
+        System.out.println("手牌："+cardsA1);
+        res = hasHighGradeCards(cardsA1,buildCards(FIRST,SECOND,FIRST,SECOND,FIRST,SECOND,TENTH,THIRD), TypeEnum.AIRCRAFT_WITH_WINGS);
+        System.out.println("可出的牌："+res);
+        System.out.println("====飞机带两对子====");
+        List<Card> cardsA2 = buildCards(FIFTH,FIFTH,FIFTH,SIXTH,SIXTH,SIXTH,SEVENTH,SEVENTH,TENTH,TENTH,NINTH);
+        System.out.println("手牌："+cardsA2);
+        res = hasHighGradeCards(cardsA2,buildCards(FIRST,SECOND,FIRST,SECOND,FIRST,SECOND,TENTH,THIRD,TENTH,THIRD), TypeEnum.AIRCRAFT_WITH_WINGS);
+        System.out.println("可出的牌："+res);
+
     }
 
-
+    private List<Card> buildCards(CardGradeEnum... arr) {
+        return Arrays.stream(arr).map(Card::new)
+                .collect(Collectors.toList());
+    }
     /**
      * 工具方法：构造一个假用户
      */

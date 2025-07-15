@@ -170,12 +170,18 @@ public class GameServiceImpl implements GameService {
         }
     }
 
+
+
     @Override
     public RoundResult playCard(User user, List<Card> cardList) {
         Room room = roomComponent.getUserRoom(user.getId());
         logger.info("[{}] 玩家 {} 出牌: {}", room.getId(), user.getUsername(), cardList);
 
         Player player = room.getPlayerByUserId(user.getId());
+        //TODO 校验出的牌是否在对应的牌堆里
+        if (!player.getCards().containsAll(cardList)){
+            throw new ForbiddenException("非法出牌");
+        }
         // 校验玩家出的牌是否符合斗地主规则规范
         TypeEnum myType = CardUtils.getCardsType(cardList);
         if (myType == null) {
