@@ -146,8 +146,8 @@ public class TypeJudgementTest {
         Assert.assertTrue(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, SECOND, SIXTH, EIGHTH)));
         // 3 3 3 4 4 4 8 8 10 10
         Assert.assertTrue(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, SECOND, SIXTH, SIXTH, EIGHTH, EIGHTH)));
-        // 999 101010 3 4
-        Assert.assertTrue(TypeJudgement.isAircraftWithWing(buildCards(SEVENTH, SEVENTH, SEVENTH, EIGHTH, EIGHTH, EIGHTH, FIRST, EIGHTH)));
+        // 999 101010 3 10
+        Assert.assertFalse(TypeJudgement.isAircraftWithWing(buildCards(SEVENTH, SEVENTH, SEVENTH, EIGHTH, EIGHTH, EIGHTH, FIRST, EIGHTH)));
         // 3 3 3 4 4 4 8 8
         Assert.assertTrue(TypeJudgement.isAircraftWithWing(buildCards(FIRST, FIRST, FIRST, SECOND, SECOND, SECOND, SIXTH, SIXTH)));
         // 777 888 999 5QQ

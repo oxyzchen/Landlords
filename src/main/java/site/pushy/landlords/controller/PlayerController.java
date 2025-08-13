@@ -54,4 +54,16 @@ public class PlayerController {
     public ApiResponse<Boolean> bid(@SessionAttribute User curUser) {
         return ApiResponse.success(playerService.canBid(curUser));
     }
+
+    /**
+     *
+     * @param curUser
+     * @return
+     */
+    @GetMapping("/tips")
+    public ApiResponse<List<Card>> Tips(@SessionAttribute User curUser) {
+        List<Card> cards = playerService.getPlayerCards(curUser);
+
+        return ApiResponse.success(cards);
+    }
 }

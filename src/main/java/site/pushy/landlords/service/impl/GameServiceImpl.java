@@ -25,8 +25,12 @@ import site.pushy.landlords.service.GameService;
 import site.pushy.landlords.service.PlayerService;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import static site.pushy.landlords.core.CardTips.hasHighGradeCards;
 
 /**
  * @author Pushy
@@ -246,6 +250,19 @@ public class GameServiceImpl implements GameService {
         notifyComponent.sendToUser(nextUser.getId(), new PleasePlayCardMessage());
         notifyComponent.sendToAllUserOfRoom(room.getId(), new PassMessage(user));
     }
+    @Override
+    public List<List<Card>> getTips(User user){
+        Room room = roomComponent.getUserRoom(user.getId());
+        Player player = room.getPlayerByUserId(user.getId());
+        List<List<Card>> tips = new ArrayList<List<Card>>();
+        if (room.getPreCards() != null && room.getPrePlayerId() != player.getId()) {
+            // 判断该玩家打出的牌是否能比上家出的牌大
+            TypeEnum preType = CardUtils.getCardsType(room.getPreCards());
+            tips = hasHighGradeCards(player.getCards(),room.getPreCards(), preType);
+            Collections.reverse(tips);
+        }
+        return tips;
+    }
 
     private void startGame(Room room) {
         if (room.getStatus() == RoomStatusEnum.PLAYING) {
@@ -285,6 +302,7 @@ public class GameServiceImpl implements GameService {
      * 1. 如果是农民, 地主剩 20 张牌
      * 2. 如果是地主, 则两个农民都必须剩 17 张牌
      */
+    //TODO 春天判断有问题，如果农民春天，应该是地主只出一次牌/
     private boolean isSpring(Room room, Player winner) {
         if (winner.isLandlord()) {
             return room.getFarmers().stream().map(s -> s.getCards().size()).allMatch(s -> s == 17);

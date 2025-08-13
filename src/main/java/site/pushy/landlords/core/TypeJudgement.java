@@ -261,7 +261,7 @@ public class TypeJudgement {
         int sum = wings.values().stream()
                 .mapToInt(Integer::intValue)
                 .sum();
-        //如果是三带一，则数量对即可
+//        如果是三带一，则数量对即可
         if(sum == aircraftList.size()){
             return true;
         }

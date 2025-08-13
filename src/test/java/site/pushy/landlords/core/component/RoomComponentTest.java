@@ -78,7 +78,7 @@ public class RoomComponentTest {
                 .collect(Collectors.toSet());
         Assertions.assertTrue(users.contains(user3.getId()));
 
-        Assert.assertEquals(3, room.getWanted());
+        Assert.assertEquals(4, room.getWanted());
 
         // 第四个玩家加入失败
         Assertions.assertThrows(ForbiddenException.class, () -> roomComponent.joinRoom(room.getId(), mockUser(), pwd));

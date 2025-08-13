@@ -45,4 +45,6 @@ public interface GameService {
      * 要不起
      */
     void pass(User user);
+
+    List<List<Card>> getTips(User user);
 }

@@ -94,4 +94,12 @@ public class GameController {
             throw new ForbiddenException("当前不是该玩家出牌回合");
         }
     }
+    /**
+     * 出牌提示
+     */
+    @PostMapping("/tips")
+    public ApiResponse<List<List<Card>>> tips(@SessionAttribute User curUser) {
+        validRound(curUser);
+        return ApiResponse.success(gameService.getTips(curUser));
+    }
 }
