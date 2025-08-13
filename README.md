@@ -1,5 +1,16 @@
 # Landlords
 
+## 主要修改
+
+1. 添加了后端校验，避免用户输入非法字符，原先的程序中比如叫地主，已经抢到了地主还能再抢，并得到地主牌，以及已出牌的校验
+2. 完善了规则，飞机带翅膀，四带一对等规则
+3. 添加出牌提示，给出所有可能的出牌可能
+
+在线地址：[https://landlords.oxyzchen.com/#/login](https://landlords.oxyzchen.com/#/login)
+
+前端: https://github.com/oxyzchen/landlords-frontend
+
+以下是原作者的介绍：
 ## 简介
 
 *Landlords* 是一款可以在线和好友一起斗地主的游戏，独乐乐不如众乐乐！
